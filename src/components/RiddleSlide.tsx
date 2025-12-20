@@ -19,6 +19,12 @@ interface RiddleSlideProps {
 export default function RiddleSlide({ slide }: RiddleSlideProps) {
   const [showAnswer, setShowAnswer] = useState(false);
 
+  const handleReveal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowAnswer(true);
+    // Manual navigation - user clicks to advance
+  };
+
   return (
     <div className="max-w-3xl w-full space-y-4 text-center my-auto">
       <motion.h2
@@ -69,10 +75,7 @@ export default function RiddleSlide({ slide }: RiddleSlideProps) {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowAnswer(true);
-            }}
+            onClick={handleReveal}
             className="px-8 py-4 bg-white/20 backdrop-blur-md text-white rounded-full text-lg font-bold shadow-2xl hover:bg-white/30 transition-all border-2 border-white/40"
           >
             Lihat Jawabannya 👀
@@ -86,7 +89,7 @@ export default function RiddleSlide({ slide }: RiddleSlideProps) {
           >
             <div className="text-5xl">🫵😎</div>
             <p className="text-2xl md:text-3xl font-black text-white drop-shadow-2xl">
-              JAWABANNYA ELO LAH!
+              JAWABANNYA LU YANG ULTAH HARI INI!!
             </p>
             <p className="text-lg md:text-xl text-white/90 drop-shadow-lg">
               (Siapa lagi coba?)

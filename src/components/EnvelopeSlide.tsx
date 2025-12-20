@@ -14,9 +14,10 @@ import type { SlideContent } from '@/src/types';
 
 interface EnvelopeSlideProps {
   slide: SlideContent;
+  onReset?: () => void;
 }
 
-export default function EnvelopeSlide({ slide }: EnvelopeSlideProps) {
+export default function EnvelopeSlide({ slide, onReset }: EnvelopeSlideProps) {
   const [isOpened, setIsOpened] = useState(false);
 
   const handleEnvelopeClick = (e: React.MouseEvent) => {
@@ -222,6 +223,24 @@ export default function EnvelopeSlide({ slide }: EnvelopeSlideProps) {
                 🎈
               </motion.span>
             </motion.div>
+
+            {/* Reset Button */}
+            {onReset && (
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5, duration: 0.6 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReset();
+                }}
+                className="px-8 py-4 bg-white/20 backdrop-blur-md text-white rounded-full text-lg font-bold shadow-2xl hover:bg-white/30 transition-all border-2 border-white/40"
+              >
+                🔄 Mulai dari Awal
+              </motion.button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

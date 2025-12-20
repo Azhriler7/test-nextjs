@@ -14,14 +14,15 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
 import { Volume2, VolumeX, Play } from 'lucide-react';
-import { slides, storyConfig, audioConfig } from '@/src/data/slides';
-import type { SlideContent } from '@/src/types';
 import Image from 'next/image';
+import confetti from 'canvas-confetti';
+
+import { slides, storyConfig, audioConfig } from '@/src/data/slides';
 import TypewriterText from './TypewriterText';
 import RiddleSlide from './RiddleSlide';
 import EnvelopeSlide from './EnvelopeSlide';
+import type { SlideContent } from '@/src/types';
 
 export default function StoryViewer() {
   const [showEntry, setShowEntry] = useState(true);
@@ -30,6 +31,8 @@ export default function StoryViewer() {
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [audioStarted, setAudioStarted] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [userStarted, setUserStarted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const currentSlide = slides[currentIndex];
@@ -62,6 +65,7 @@ export default function StoryViewer() {
     if (currentIndex < totalSlides - 1) {
       setCurrentIndex((prev) => prev + 1);
       setProgress(0);
+      setIsTyping(false);
     }
   }, [currentIndex, totalSlides]);
 
@@ -73,9 +77,37 @@ export default function StoryViewer() {
     }
   }, [currentIndex]);
 
-  // Auto-advance timer
+  // Handle typing start
+  const handleTypingStart = useCallback(() => {
+    setIsTyping(true);
+    setProgress(0);
+  }, []);
+
+  // Handle typing complete
+  const handleTypingComplete = useCallback(() => {
+    setIsTyping(false);
+    // Manual navigation only - user clicks to advance
+  }, []);
+
+  // Reset to beginning (entry screen)
+  const handleReset = useCallback(() => {
+    setCurrentIndex(0);
+    setProgress(0);
+    setShowEntry(true);
+    setAudioStarted(false);
+    setIsTyping(false);
+    setUserStarted(false);
+    
+    // Stop and reset audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, []);
+
+  // Auto-advance timer (only starts after user interaction)
   useEffect(() => {
-    if (showEntry || !storyConfig.autoAdvance || isPaused || !currentSlide) return;
+    if (showEntry || !storyConfig.autoAdvance || isPaused || !currentSlide || isTyping || !userStarted) return;
 
     const duration = currentSlide.duration || storyConfig.defaultDuration;
     const interval = 50;
@@ -92,10 +124,16 @@ export default function StoryViewer() {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [currentIndex, currentSlide, isPaused, goToNext, showEntry]);
+  }, [currentIndex, currentSlide, isPaused, goToNext, showEntry, isTyping, userStarted]);
 
   // Handle click navigation
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Start timer on first click/tap
+    if (!userStarted) {
+      setUserStarted(true);
+      return;
+    }
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const threshold = rect.width / 3;
@@ -154,10 +192,16 @@ export default function StoryViewer() {
               >
                 <div className="text-6xl mb-4">🎂</div>
                 <h1 className="text-3xl font-bold text-white mb-4">
-                  Dokumen Rahasia Terdeteksi
+                  Khusus buat my bestie cempreng
                 </h1>
+                <p className="text-white/70 text-lg mb-2">
+                  Sengaja kasih jam segini biar dibukanya besok aja...
+                </p>
+                <p className="text-white/70 text-lg mb-2">
+                  Disclaimer dulu yaa, ini ada background music-nya 
+                </p>
                 <p className="text-white/70 text-lg mb-8">
-                  Klik untuk membuka data classified...
+                  jadi kecilin volume HP luwh biar gak kaget. 😁
                 </p>
               </motion.div>
 
@@ -171,7 +215,7 @@ export default function StoryViewer() {
                 className="px-8 py-4 bg-white text-black rounded-full text-xl font-bold shadow-2xl hover:bg-gray-100 transition-all flex items-center gap-3 mx-auto"
               >
                 <Play className="w-6 h-6" />
-                BUKA DOKUMEN RAHASIA
+                TAP DISINI!!!
               </motion.button>
             </div>
           </motion.div>
@@ -259,22 +303,36 @@ export default function StoryViewer() {
 
         {/* Slide Content */}
         <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.6 }}
-            className="h-full flex items-center justify-center px-6 py-16 overflow-y-auto"
-          >
-            {currentSlide.type === 'intro' && <IntroSlide slide={currentSlide} />}
-            {currentSlide.type === 'hero' && <HeroSlide slide={currentSlide} />}
-            {currentSlide.type === 'riddle' && <RiddleSlide slide={currentSlide} />}
-            {currentSlide.type === 'envelope' && <EnvelopeSlide slide={currentSlide} />}
-            {currentSlide.type === 'finale' && (
-              <FinaleSlide slide={currentSlide} onCelebrate={triggerConfetti} />
-            )}
-          </motion.div>
+          {currentSlide && (
+            <motion.div
+              key={currentSlide.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6 }}
+              className="h-full flex items-center justify-center px-6 py-16 overflow-y-auto"
+            >
+              {currentSlide.type === 'intro' && (
+                <IntroSlide 
+                  slide={currentSlide} 
+                  onTypingStart={handleTypingStart}
+                  onTypingComplete={handleTypingComplete}
+                />
+              )}
+              {currentSlide.type === 'hero' && (
+                <HeroSlide 
+                  slide={currentSlide} 
+                  onTypingStart={handleTypingStart}
+                  onTypingComplete={handleTypingComplete}
+                />
+              )}
+              {currentSlide.type === 'riddle' && <RiddleSlide slide={currentSlide} />}
+              {currentSlide.type === 'envelope' && <EnvelopeSlide slide={currentSlide} onReset={handleReset} />}
+              {currentSlide.type === 'finale' && (
+                <FinaleSlide slide={currentSlide} onCelebrate={triggerConfetti} />
+              )}
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* Navigation Hints */}
@@ -292,7 +350,17 @@ export default function StoryViewer() {
  */
 
 // Intro Slide (Text Only)
-function IntroSlide({ slide }: { slide: SlideContent }) {
+function IntroSlide({ 
+  slide, 
+  onTypingStart,
+  onTypingComplete
+}: { 
+  slide: SlideContent; 
+  onTypingStart: () => void;
+  onTypingComplete: () => void;
+}) {
+  // Manual navigation only - no auto-advance
+
   return (
     <div className="text-center space-y-4 max-w-2xl my-auto">
       <motion.h1
@@ -319,8 +387,10 @@ function IntroSlide({ slide }: { slide: SlideContent }) {
         <TypewriterText
           text={slide.description}
           className="text-lg md:text-xl text-white/90 drop-shadow-lg font-medium"
-          delay={0.3}
-          speed={0.003}
+          delay={0.5}
+          speed={0.025}
+          onStart={onTypingStart}
+          onComplete={onTypingComplete}
         />
       )}
     </div>
@@ -328,7 +398,15 @@ function IntroSlide({ slide }: { slide: SlideContent }) {
 }
 
 // Hero Slide (With Transparent PNG Character)
-function HeroSlide({ slide }: { slide: SlideContent }) {
+function HeroSlide({ 
+  slide, 
+  onTypingStart,
+  onTypingComplete
+}: { 
+  slide: SlideContent; 
+  onTypingStart: () => void;
+  onTypingComplete: () => void;
+}) {
   return (
     <div className="max-w-3xl w-full space-y-4 text-center my-auto">
       <motion.h2
@@ -364,8 +442,10 @@ function HeroSlide({ slide }: { slide: SlideContent }) {
       <TypewriterText
         text={slide.description!}
         className="text-base md:text-lg text-white/90 drop-shadow-lg font-medium px-4"
-        delay={0.4}
-        speed={0.003}
+        delay={0.5}
+        speed={0.025}
+        onStart={onTypingStart}
+        onComplete={onTypingComplete}
       />
     </div>
   );
@@ -414,8 +494,8 @@ function FinaleSlide({
       <TypewriterText
         text={slide.description!}
         className="text-base md:text-lg text-white/90 drop-shadow-lg font-medium px-6"
-        delay={0.3}
-        speed={0.003}
+        delay={0.5}
+        speed={0.025}
       />
 
       <motion.button

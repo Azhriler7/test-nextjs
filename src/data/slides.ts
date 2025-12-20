@@ -11,15 +11,15 @@
 import type { SlideContent, StoryConfig } from '@/src/types';
 
 export const storyConfig: StoryConfig = {
-  autoAdvance: true,
-  defaultDuration: 8000, // 8 seconds per slide
-  transitionDuration: 600, // 0.6 seconds transition
+  autoAdvance: false, // Manual navigation only (click to advance)
+  defaultDuration: 10000, // 10 seconds per slide
+  transitionDuration: 700, // 0.7 seconds transition
 };
 
 // Background audio configuration
 export const audioConfig = {
-  src: '/lofi-chill-124673.mp3', // Local file
-  volume: 1.0, // Max volume
+  src: '/song.mp3', // Local file
+  volume: 0.6, // Max volume
 };
 
 export const slides: SlideContent[] = [
@@ -27,11 +27,11 @@ export const slides: SlideContent[] = [
   {
     id: 1,
     type: 'intro',
-    title: 'Sebuah Paket Kilat... 📦✨',
-    subtitle: 'Dari: Ajil.\nUntuk: Bestie Ter-Riweuh Sedunia. 🤪\n(Klik layar buat unboxing 👇)',
+    title: 'Haii ada paket nih... 📦✨',
+    subtitle: 'Dari: Ajil.\nUntuk: cewe paling rajin sedunia. 😽\n(tap layar buat lanjut 👇)',
     description: '',
     backgroundImage: '/bg1.jpg',
-    duration: 5000,
+    duration: 7000,
   },
   
   // Slide 2: Reality Check (Relatable)
@@ -39,7 +39,7 @@ export const slides: SlideContent[] = [
     id: 2,
     type: 'hero',
     title: 'Disclaimer Dulu 🚨',
-    description: 'Gua tau lu capek 😮‍💨, punggung encok, dan pengen resign tiap hari senin. Tapi... tetep semangat ya! 💪 Kalau lu nyerah, nanti siapa yang gue ajak gibah? 🤫',
+    description: 'Lu tau kan kalo gua ini pelupa 😁🤞. Tapi... khusus tanggal 21 DESEMBER ini gua inget satu hal. Spesial buat lu kado dari gua buat birthday girl hari ini. 🎉🎉',
     images: ['/photo1.png'],
     backgroundImage: '/bg2.jpg',
     duration: 6000,
@@ -50,7 +50,7 @@ export const slides: SlideContent[] = [
     id: 3,
     type: 'hero',
     title: 'Ada Pantun Nih 🎤',
-    description: 'Buah manggis, buah kedondong. 🍇\nJangan nangis dong, senyum dong. 😊\n\nBeli paku sama Anya Geraldine.\nHappy birthday buat kamu yang paling ngangenin! (Cie elah 🤮🤣)',
+    description: 'Ikan hiu lagi keramas, 🦈\nKeramasnya pake sabun cuci muka. 🧼\nMet ultah wanita pekerja keras,\nSemoga rezekinya lancar terbuka! 💸\n(sorry kalo pantunnya jelek hehe🤡, I tried my best)',
     images: ['/photo2.png'],
     backgroundImage: '/bg3.jpg',
     duration: 7000,
@@ -60,8 +60,8 @@ export const slides: SlideContent[] = [
   {
     id: 4,
     type: 'riddle',
-    title: 'Kuis Dadakan 🤔',
-    description: 'Siapa orang paling cantik, pinter, tapi kadang lemot 🏃‍♀️ yang ulang tahun hari ini?',
+    title: 'TEBAK TEBAKAN 🤔',
+    description: 'Siapa orang paling cantik, pinter, dan rajinnya kebangetan 🧐',
     images: ['/photo3.png'],
     backgroundImage: '/bg4.jpg',
     duration: 8000,
@@ -71,9 +71,9 @@ export const slides: SlideContent[] = [
   {
     id: 5,
     type: 'envelope',
-    title: 'Surat Terakhir 💌',
+    title: 'Last 💌',
     subtitle: '(Tap amplopnya)',
-    description: 'Selamat Ulang Tahun! 🥳🎉 Doa gua simpel: Semoga saldo ATM lu sebanyak drama hidup lu 💰, dan bahagia lu sepanjang jalan kenangan. Aamiin! 🤲✨',
+    description: 'Happy Birthday bill!! 🎂 Gue tau sekarang lu capek banget harus bagi otak buat kerjaan & tugas kampus. Tapi gue bangga banget sama lo! ❤️ Lo keren bisa jalanin keduanya. Inget ya, ngejar mimpi boleh, tapi jangan sampe sakit. Kalau tugas numpuk, napas dulu! Semangat Maba! 🔥💪',
     images: ['/photo4.jpeg'],
     backgroundImage: '/bg5.jpg',
     duration: 12000,

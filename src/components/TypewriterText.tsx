@@ -15,31 +15,39 @@ interface TypewriterTextProps {
   className?: string;
   delay?: number;
   speed?: number;
+  onStart?: () => void;
+  onComplete?: () => void;
 }
 
 function TypewriterTextInner({ 
   text, 
   className = '', 
-  delay = 0.1, // Minimal delay
-  speed = 0.003 // Super fast typing (almost instant)
-}: TypewriterTextProps) {
+  delay = 0.7,
+  speed = 0.025, // Slower typing for readability
+  onStart,
+  onComplete
+}: TypewriterTextProps & { onStart?: () => void; onComplete?: () => void }) {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
 
   useEffect(() => {
-    const delayTimeout = setTimeout(() => {
-      if (currentIndex < text.length) {
-        const timer = setTimeout(() => {
-          setDisplayedText((prev) => prev + text[currentIndex]);
-          setCurrentIndex((prev) => prev + 1);
-        }, speed * 1000);
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        if (currentIndex === 0 && !hasStarted && onStart) {
+          onStart();
+          setHasStarted(true);
+        }
+        setDisplayedText((prev) => prev + text[currentIndex]);
+        setCurrentIndex((prev) => prev + 1);
+      }, currentIndex === 0 ? delay * 1000 : speed * 1000);
 
-        return () => clearTimeout(timer);
-      }
-    }, delay * 1000);
-
-    return () => clearTimeout(delayTimeout);
-  }, [text, currentIndex, delay, speed]);
+      return () => clearTimeout(timer);
+    } else if (currentIndex === text.length && onComplete) {
+      // Typing complete, notify parent immediately
+      onComplete();
+    }
+  }, [text, currentIndex, delay, speed, onStart, onComplete, hasStarted]);
 
   return (
     <motion.p
